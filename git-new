@@ -1,0 +1,69 @@
+#!/bin/bash
+set -xeo pipefail
+
+usage() {
+    cat << EOF
+NAME:
+    git-new: Create a new branch from a remote source branch
+
+USAGE:
+    git-new <branch> [<source> [<remote>]]
+
+      <branch>: Name of the new branch to create
+
+      <source>: existing branch to copy from.
+                Default is the value of the environment variable
+                GIT_NEW_SOURCE or if not set, the first existing
+                branch from:
+                  upstream: dev,develop, main, master
+                  origin: dev,develop, main, master
+
+      <remote>: repo to push the new branch to
+                Default is the value of the environment variable
+                GIT_NEW_REMOTE or origin if it is not set
+EOF
+    exit 1
+}
+
+if [[ -z $1 ]]; then
+    usage
+fi
+
+# if ! git diff-index --quiet HEAD --; then
+#    echo 'Changes in your workspace would be overwritten'
+#    exit 1
+# fi
+
+branch=$1
+
+source=${2:-$GIT_NEW_SOURCE}
+
+if [[ $source ]]; then
+    git fetch $2 >/dev/null
+else
+    for repo in upstream origin; do
+        for branch in dev develop main master; do
+            if git fetch $repo $branch >/dev/null 2>/dev/null; then
+                source=$repo/$branch
+                break
+            fi
+        done
+        if [[ $source ]]; then
+            break
+        fi
+    done
+
+    if [[ -z $source ]]; then
+        echo "Couldn't find upstream"
+        exit 1
+    fi
+fi
+
+remote=${3:-$GIT_NEW_REMOTE}
+remote=${remote:-origin}
+
+echo $branch $source $remote
+
+# git fetch $source
+# git checkout -b $branch $source
+# git push $branch -u $remote
