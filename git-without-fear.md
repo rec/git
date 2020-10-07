@@ -5,14 +5,13 @@ rightfully worry about losing data.
 
 Here are a few simple rules that will make your life more serene.
 
-1. Once you have created a commit in your repo, it's almost impossible to lose
-   it if you never type `git gc`
+## 1. Once you have created a commit, it's almost impossible to lose it
 
 Here's the panic point - you just commited a week's worth of code and then you
 did something complicated and now you don't see the code you just wrote.
 
-Relax!  Even if you can't see that code in any of your branches, it is not
-gone.  In fact, you probably have commits you discarded weeks or even months ago
+Relax!  Even if you can't see that code in any of your branches, it is not gone.
+In fact, you probably have commits you discarded weeks or even months ago
 floating around in your repository.
 
 You can think of the Git repo as a database that maps commit IDs to states of
@@ -39,20 +38,42 @@ duplicates, that's natural
 
 `git reflog --all` shows everything.  There it is (almost certainly)!
 
-(But if you type `git gc` your reflog is erased. Code is tiny.  Time is
+But if you type `git gc` your reflog is erased. Code is tiny.  Time is
 precious. Never `git gc` unless you really need to.  `git reflog` has
-options that fry the reflog - beware those also.)
+options that fry the reflog - beware those also.
 
-Your commit is in the reflog, so you can relax.  How to get it back?  Wait a bit
-and I'll show you.  But first:
+So your lost commit ID is in the reflog - or you found the commit message it in
+the terminal.  How to get it back?
 
-2. If you don't ever commit your code, it can simply vanish like the morning dew
+## 3.  How to restore any commit ID to a new branch
 
-Now, git is quite careful here.  In normal operation, it's fairly hard to
+Suppose you have found some `<commit-id>` from the reflog, or just from
+scrolling back in your terminal.
+
+To create a new branch `<branch>` containing `<commit-id>`:
+
+    git switch -c <branch> <commit-id>
+
+    # Or if you have an older git version
+    git checkout -b <branch> <commit-id>
+
+For example, `git switch -c working 985a61d` creates a new branch named
+`working` with commit ID `985a61d`.
+
+## 4. If you don't ever commit your code, it can simply vanish like the morning dew
+
+Git is fairly careful.  In normal operation, it's fairly hard to
 overwrite your uncommitted changes.  But emergencies and mistakes happen.
+
+ But `git reset` is the atom bomb of git.  You can easily overwrite
+uncommitted work with it if you aren't careful.
 
 You can avoid this in two easy ways: lots of tiny commits, and liberal use of
 `git stash`.
+
+
+
+
 
 3. Use `git stash` as your trash
 
